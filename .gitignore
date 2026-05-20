@@ -1,0 +1,42 @@
+# ============================================================
+# .gitignore - Files to exclude from Git
+# ============================================================
+# These files should NOT be uploaded to GitHub/Git
+# They contain sensitive information or are temporary
+
+# Environment Variables (SENSITIVE - NEVER COMMIT!)
+.env
+.env.local
+.env.*.local
+
+# Node modules (recreate with npm install)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# OS files
+Thumbs.db
+Desktop.ini
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+tmp/
+temp/
+dist/
+build/
+
+# Package manager lock files (optional, but recommended)
+# package-lock.json
+# yarn.lock

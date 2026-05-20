@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stayora Atlas Tester - MongoDB Testing Dashboard</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <!-- ====================================================== -->
+  <!-- HEADER & NAVIGATION -->
+  <!-- ====================================================== -->
+  <header class="header">
+    <div class="header-content">
+      <div class="logo-section">
+        <h1 class="logo">
+          <span class="logo-icon">⚡</span>
+          <span class="logo-text">Stayora Atlas Tester</span>
+        </h1>
+        <p class="tagline">MongoDB Atlas Connection & CRUD Testing</p>
+      </div>
+      
+      <nav class="nav-buttons">
+        <a href="/" class="nav-btn active">Dashboard</a>
+        <a href="/test" class="nav-btn test-link" target="_blank">🔧 Test Connection</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ====================================================== -->
+  <!-- MAIN CONTAINER -->
+  <!-- ====================================================== -->
+  <main class="container">
+    
+    <!-- ====================================================== -->
+    <!-- STATUS & MESSAGES -->
+    <!-- ====================================================== -->
+    <% if (message) { %>
+      <div class="alert alert-success">
+        <span class="alert-icon">✓</span>
+        <%= message %>
+      </div>
+    <% } %>
+
+    <% if (error) { %>
+      <div class="alert alert-error">
+        <span class="alert-icon">!</span>
+        <%= error %>
+      </div>
+    <% } %>
+
+    <!-- ====================================================== -->
+    <!-- WELCOME SECTION -->
+    <!-- ====================================================== -->
+    <section class="welcome-section">
+      <div class="welcome-card">
+        <h2>Welcome to Stayora Atlas Tester 🚀</h2>
+        <p>
+          This application helps you test your MongoDB Atlas connection and perform CRUD operations.
+          Use the form below to add users, view all users, and test the database connection.
+        </p>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-icon">📊</span>
+            <p><strong>Total Users:</strong> <span class="user-count"><%= users.length %></span></p>
+          </div>
+          <div class="info-item">
+            <span class="info-icon">🔗</span>
+            <p><strong>Connection:</strong> <span class="connection-status">Click "Test Connection" ↗</span></p>
+          </div>
+          <div class="info-item">
+            <span class="info-icon">⚙️</span>
+            <p><strong>Operations:</strong> Create, Read, Delete</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================== -->
+    <!-- ADD USER FORM SECTION -->
+    <!-- ====================================================== -->
+    <section class="form-section">
+      <div class="form-card">
+        <h2>➕ Add New User</h2>
+        <p class="form-description">Fill in the form below to add a new user to the database</p>
+        
+        <form method="POST" action="/add" class="user-form" id="addUserForm">
+          <!-- Name Input -->
+          <div class="form-group">
+            <label for="name" class="form-label">
+              <span class="label-text">Full Name</span>
+              <span class="required">*</span>
+            </label>
+            <input 
+              type="text" 
+              id="name" 
+              name="name" 
+              placeholder="Enter full name (e.g., John Doe)"
+              required
+              minlength="2"
+              maxlength="50"
+              class="form-input"
+            >
+            <small class="form-hint">2-50 characters</small>
+          </div>
+
+          <!-- Email Input -->
+          <div class="form-group">
+            <label for="email" class="form-label">
+              <span class="label-text">Email Address</span>
+              <span class="required">*</span>
+            </label>
+            <input 
+              type="email" 
+              id="email" 
+              name="email" 
+              placeholder="Enter email (e.g., john@example.com)"
+              required
+              class="form-input"
+            >
+            <small class="form-hint">Must be a valid email address</small>
+          </div>
+
+          <!-- Phone Input -->
+          <div class="form-group">
+            <label for="phone" class="form-label">
+              <span class="label-text">Phone Number</span>
+              <span class="optional">(Optional)</span>
+            </label>
+            <input 
+              type="tel" 
+              id="phone" 
+              name="phone" 
+              placeholder="Enter phone number (e.g., +1-234-567-8900)"
+              class="form-input"
+            >
+            <small class="form-hint">International format supported</small>
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" class="btn-primary">
+            <span class="btn-icon">➕</span>
+            <span>Add User to Database</span>
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ====================================================== -->
+    <!-- USERS LIST SECTION -->
+    <!-- ====================================================== -->
+    <section class="users-section">
+      <div class="users-card">
+        <h2>👥 Users in Database</h2>
+        
+        <% if (users && users.length > 0) { %>
+          <!-- Users Table -->
+          <div class="table-wrapper">
+            <table class="users-table">
+              <thead>
+                <tr>
+                  <th class="col-name">Name</th>
+                  <th class="col-email">Email</th>
+                  <th class="col-phone">Phone</th>
+                  <th class="col-date">Added</th>
+                  <th class="col-action">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% users.forEach((user, index) => { %>
+                  <tr class="user-row" data-user-id="<%= user._id %>">
+                    <td class="col-name">
+                      <span class="user-avatar"><%= user.name.charAt(0).toUpperCase() %></span>
+                      <%= user.name %>
+                    </td>
+                    <td class="col-email">
+                      <a href="mailto:<%= user.email %>"><%= user.email %></a>
+                    </td>
+                    <td class="col-phone">
+                      <% if (user.phone) { %>
+                        <a href="tel:<%= user.phone %>"><%= user.phone %></a>
+                      <% } else { %>
+                        <span class="empty">—</span>
+                      <% } %>
+                    </td>
+                    <td class="col-date">
+                      <%= new Date(user.createdAt).toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'short', 
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      }) %>
+                    </td>
+                    <td class="col-action">
+                      <button 
+                        class="btn-delete" 
+                        onclick="deleteUser('<%= user._id %>', '<%= user.name %>')"
+                        title="Delete this user"
+                      >
+                        🗑️ Delete
+                      </button>
+                    </td>
+                  </tr>
+                <% }); %>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- User Count Summary -->
+          <div class="users-summary">
+            <p>
+              Showing <strong><%= users.length %></strong> user<%= users.length !== 1 ? 's' : '' %> 
+              in the database
+            </p>
+          </div>
+
+        <% } else { %>
+          <!-- Empty State -->
+          <div class="empty-state">
+            <span class="empty-icon">📭</span>
+            <h3>No Users Yet</h3>
+            <p>The database is empty. Use the form above to add your first user!</p>
+          </div>
+        <% } %>
+      </div>
+    </section>
+
+    <!-- ====================================================== -->
+    <!-- TESTING INFORMATION SECTION -->
+    <!-- ====================================================== -->
+    <section class="info-section">
+      <div class="info-card">
+        <h2>📚 How to Use This Tester</h2>
+        <div class="steps">
+          <div class="step">
+            <span class="step-number">1</span>
+            <h3>Add User</h3>
+            <p>Fill the form above and click "Add User to Database" to create a new user in MongoDB Atlas</p>
+          </div>
+          <div class="step">
+            <span class="step-number">2</span>
+            <h3>View Users</h3>
+            <p>All users are displayed in the table below. Each user shows their details and creation date</p>
+          </div>
+          <div class="step">
+            <span class="step-number">3</span>
+            <h3>Test Connection</h3>
+            <p>Click "Test Connection" at the top to verify your MongoDB Atlas connection is working</p>
+          </div>
+          <div class="step">
+            <span class="step-number">4</span>
+            <h3>Delete User</h3>
+            <p>Remove a user from the database by clicking the "Delete" button in the user's row</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================== -->
+    <!-- TECHNICAL DETAILS SECTION -->
+    <!-- ====================================================== -->
+    <section class="tech-section">
+      <div class="tech-card">
+        <h2>🔧 Technical Details</h2>
+        <div class="tech-details">
+          <div class="tech-item">
+            <h4>📍 Routes Available</h4>
+            <ul>
+              <li><code>GET /</code> - Home page with user management</li>
+              <li><code>POST /add</code> - Add new user</li>
+              <li><code>GET /users</code> - Get all users as JSON</li>
+              <li><code>DELETE /delete/:id</code> - Delete user by ID</li>
+              <li><code>GET /test</code> - Test MongoDB connection</li>
+            </ul>
+          </div>
+          <div class="tech-item">
+            <h4>🛠️ Tech Stack</h4>
+            <ul>
+              <li>Backend: Node.js + Express.js</li>
+              <li>Database: MongoDB Atlas</li>
+              <li>Templating: EJS</li>
+              <li>ODM: Mongoose</li>
+              <li>Styling: Custom CSS</li>
+            </ul>
+          </div>
+          <div class="tech-item">
+            <h4>✅ Features</h4>
+            <ul>
+              <li>Full CRUD operations</li>
+              <li>Form validation</li>
+              <li>Error handling</li>
+              <li>Connection testing</li>
+              <li>Responsive design</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ====================================================== -->
+  <!-- FOOTER -->
+  <!-- ====================================================== -->
+  <footer class="footer">
+    <p>Stayora Atlas Tester v1.0 | MongoDB Atlas Connection Testing Tool</p>
+    <p class="footer-hint">💡 Tip: Use the /test route for detailed connection diagnostics</p>
+  </footer>
+
+  <!-- ====================================================== -->
+  <!-- JAVASCRIPT FOR INTERACTIVITY -->
+  <!-- ====================================================== -->
+  <script>
+    // Function to delete a user
+    function deleteUser(userId, userName) {
+      // Show confirmation dialog
+      if (confirm(`Are you sure you want to delete "${userName}"? This action cannot be undone.`)) {
+        // Send DELETE request to server
+        fetch(`/delete/${userId}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            // Show success message and refresh page
+            alert(`✅ ${data.message}`);
+            location.reload();
+          } else {
+            // Show error message
+            alert(`❌ Error: ${data.error}`);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('❌ Failed to delete user. Please try again.');
+        });
+      }
+    }
+
+    // Form validation and styling
+    const form = document.getElementById('addUserForm');
+    
+    if (form) {
+      form.addEventListener('submit', function(e) {
+        // Show loading state
+        const submitBtn = form.querySelector('.btn-primary');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '⏳ Adding User...';
+        submitBtn.disabled = true;
+      });
+
+      // Add input focus effects
+      const inputs = form.querySelectorAll('.form-input');
+      inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+          this.parentElement.classList.add('focused');
+        });
+        input.addEventListener('blur', function() {
+          this.parentElement.classList.remove('focused');
+        });
+      });
+    }
+
+    // Animate user count on page load
+    window.addEventListener('load', function() {
+      const countElement = document.querySelector('.user-count');
+      if (countElement) {
+        countElement.style.animation = 'fadeInScale 0.6s ease-out';
+      }
+    });
+  </script>
+</body>
+</html>
+
+<!-- ====================================================== -->
+<!-- EJS TEMPLATE EXPLANATION:
+     ====================================================== -->
+     
+<!-- <% %> - For JavaScript logic (if statements, loops, etc.) -->
+<!-- <%= %> - For displaying variables on the page -->
+<!-- <%- %> - For rendering HTML content -->
+
+<!-- This template receives:
+  - users: Array of user objects from the database
+  - message: Success message (if any)
+  - error: Error message (if any)
+-->

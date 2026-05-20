@@ -1,0 +1,32 @@
+{
+  "name": "stayora-atlas-tester",
+  "version": "1.0.0",
+  "description": "Full-stack MongoDB Atlas testing application with Node.js, Express, and EJS",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "keywords": [
+    "mongodb",
+    "atlas",
+    "testing",
+    "crud",
+    "express"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^7.5.0",
+    "ejs": "^3.1.9",
+    "dotenv": "^16.3.1",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": "18.0.0"
+  }
+}
